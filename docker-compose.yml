@@ -1,0 +1,25 @@
+db:
+  image: orchardup/mysql
+  environment:
+    MYSQL_USER: root
+    MYSQL_PASSWORD: root
+    MYSQL_DATABASE: simpleDB
+  ports:
+    - 3307:3306
+
+dbinit:
+  image: orchardup/mysql
+  entrypoint: /bin/bash
+  volumes:
+    - .:/host
+  command: -c "sleep 20; mysql -u root --password=root -h mysql simpleDB < /host/init.sql; exit 0"
+  links:
+    - db:mysql
+
+app:
+  build: .
+  links:
+    - dbinit
+    - db:mysql
+  ports:
+    - 8080:8080
